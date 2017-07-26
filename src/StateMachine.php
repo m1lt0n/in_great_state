@@ -62,24 +62,27 @@ abstract class StateMachine
      */
     public function transitionTo($state)
     {
-        foreach ($this->transitions as $transition) {
-            if ($transition->from !== null && $transition->from !== $this->owner->currentState()) {
-                continue;
-            }
+        $transitioned = false;
 
-            if ($transition->to !== $state) {
+        foreach ($this->transitions as $transition) {
+            if ($transition->to !== $state ||
+                ($transition->from !== null && $transition->from !== $this->owner->currentState())
+            ) {
                 continue;
             }
 
             $cb = $transition->actions;
             $cb($this->owner);
-            $this->owner->setState($state);
-            return;
+            $transitioned = true;
         }
 
-        throw new Exceptions\InvalidStateTransition(
-            "Attempted transition is not registered in the state machine"
-        );
+        if ($transitioned) {
+            $this->owner->setState($state);
+        } else {
+            throw new Exceptions\InvalidStateTransition(
+                "Attempted transition is not registered in the state machine"
+            );
+        }
     }
 
     /**

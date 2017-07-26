@@ -32,5 +32,9 @@ class IssueStateMachine extends InGreatState\StateMachine
         $this->addTransition()->from('open')->to('in progress')->actions(function ($owner) {
             $owner->statesLog[] = "open->in progress";
         });
+
+        $this->addTransition()->to('closed')->actions(function ($owner) {
+            $owner->statesLog[] = "any->closed";
+        });
     }
 }

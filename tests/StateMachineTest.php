@@ -43,4 +43,16 @@ class StateMachineTest extends TestCase
         $this->assertEquals('closed', $owner->getValue($this->sut)->state);
         $this->assertEquals('in progress->closed', $owner->getValue($this->sut)->statesLog[0]);
     }
+
+    public function testTransitionToValidTransitionMoreThanOneMatchingTransitions()
+    {
+        $this->sut->transitionTo('closed');
+        $refl = new ReflectionClass($this->sut);
+        $owner = $refl->getProperty('owner');
+        $owner->setAccessible(true);
+
+        $this->assertEquals('closed', $owner->getValue($this->sut)->state);
+        $this->assertEquals('in progress->closed', $owner->getValue($this->sut)->statesLog[0]);
+        $this->assertEquals('any->closed', $owner->getValue($this->sut)->statesLog[1]);
+    }
 }

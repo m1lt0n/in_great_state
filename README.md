@@ -70,4 +70,18 @@ the phrases:
 * Resolving transition from open to resolved (triggered from the transition open->resolved)
 * Setting state to resolved  (triggered from setState of Issue)
 
+The transition API is fluid and allows method chaining. If you want to add a transition from any initial state, you just specify the final state and actions like that:
+
+```php
+<?php
+
+$this->addTransition()->to('wontfix')->actions(function ($owner) {
+    echo "Resolving transition to wontfix" . PHP_EOL;
+});
+```
+
+The code above will match any transitions to wontfix from any initial state. Also note that all matching transitions actions will be triggered (i.e. execution does not stop when one matching transition is found, so you can have multiple transition registrations from open->closed etc).
+
+An important note is that it is considered a good practice to throw exceptions in your closures in order to stop execution of the transitions and avoid inconsistent data to sneak into your application. Also, if you are persisting data in a database during transitions (and within your closures and/or your setState method), it's good to wrap your transition in a database transaction in order to rollback all changes and avoid inconsistent data structure.
+
 The architecture is flexible enough accomodate any web framework or ORM integration and it's very easy to add features such as state logging (you can just store the state transitions in a database or even a flat file by implementing the functionality in the setState method of the stateful object). You are 100% in control!
